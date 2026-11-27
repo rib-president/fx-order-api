@@ -23,6 +23,7 @@ public class ExchangeRateService {
         List<ExchangeRateHistory> latest = exchangeRateHistoryRepository.findLatest();
 
         List<ExchangeRateDto> dtos = latest.stream()
+                .filter(e -> e.getCurrencyCode() != CurrencyCode.KRW)
                 .map(e -> new ExchangeRateDto(
                         e.getCurrencyCode().name(),
                         e.getBuyRate(),
