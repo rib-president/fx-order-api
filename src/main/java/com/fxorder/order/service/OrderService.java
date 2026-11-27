@@ -48,6 +48,14 @@ public class OrderService {
         CurrencyCode toCurrencyCode = request.getToCurrency();
         BigDecimal forexAmount = request.getForexAmount();
 
+        if (fromCurrencyCode == null || toCurrencyCode == null) {
+            throw new IllegalArgumentException("보내는 통화와 받는 통화는 필수입니다.");
+        }
+
+        if (forexAmount == null) {
+            throw new IllegalArgumentException("주문 수량은 필수입니다.");
+        }
+
         if (fromCurrencyCode == toCurrencyCode) {
             throw new IllegalArgumentException("같은 통화끼리는 주문할 수 없습니다.");
         }
