@@ -60,13 +60,13 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Exchange rate not found for " + toCurrencyCode));
             tradeRate = exchangeRate.getBuyRate();
             toAmount = forexAmount;
-            fromAmount = forexAmount.multiply(tradeRate).setScale(0, RoundingMode.DOWN);
+            fromAmount = forexAmount.multiply(tradeRate).divide(toCurrencyCode.getUnit(), 0, RoundingMode.DOWN);
         } else {
             ExchangeRateHistory exchangeRate = exchangeRateHistoryRepository.findFirstByCurrencyCodeOrderByDateTimeDesc(fromCurrencyCode)
                 .orElseThrow(() -> new IllegalArgumentException("Exchange rate not found for " + fromCurrencyCode));
             tradeRate = exchangeRate.getSellRate();
             fromAmount = forexAmount;
-            toAmount = forexAmount.multiply(tradeRate).setScale(0, RoundingMode.DOWN);
+            toAmount = forexAmount.multiply(tradeRate).divide(fromCurrencyCode.getUnit(), 0, RoundingMode.DOWN);
         }
 
         Balance fromBalance = balanceRepository.findWithLockByCurrencyCode(fromCurrencyCode)
