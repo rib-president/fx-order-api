@@ -48,6 +48,10 @@ public class OrderService {
         CurrencyCode toCurrencyCode = request.getToCurrency();
         BigDecimal forexAmount = request.getForexAmount();
 
+        if (fromCurrencyCode == toCurrencyCode) {
+            throw new IllegalArgumentException("같은 통화끼리는 주문할 수 없습니다.");
+        }
+
         if (fromCurrencyCode != CurrencyCode.KRW && toCurrencyCode != CurrencyCode.KRW) {
             throw new IllegalArgumentException("모든 주문은 KRW를 기준으로 매수/매도 진행되어야 합니다.");
         }
