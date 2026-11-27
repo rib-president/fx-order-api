@@ -20,8 +20,10 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -93,6 +95,48 @@ class OrderServiceTest {
         assertThat(response.getToAmount()).isEqualByComparingTo("9025");
         assertThat(jpy.getAmount()).isEqualByComparingTo("4000");
         assertThat(krw.getAmount()).isEqualByComparingTo("9025");
+    }
+
+    @Test
+    @DisplayName("KRW -> KRW 같은 통화 주문은 거부된다")
+    void rejectsSameCurrencyKrwOrder() {
+        assertThatThrownBy(() -> orderService.createOrder(
+                new OrderRequest(new BigDecimal("1000"), CurrencyCode.KRW, CurrencyCode.KRW)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("같은 통화");
+
+        then(exchangeRateHistoryRepository).shouldHaveNoInteractions();
+        then(balanceRepository).shouldHaveNoInteractions();
+        then(orderHistoryRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("통화를 보내지 않으면 통화가 필수라는 사유로 거부된다")
+    void rejectsMissingCurrency() {
+        assertThatThrownBy(() -> orderService.createOrder(
+                new OrderRequest(new BigDecimal("1000"), null, null)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("통화는 필수");
+    }
+
+    @Test
+    @DisplayName("주문 수량을 보내지 않으면 수량이 필수라는 사유로 거부된다")
+    void rejectsMissingForexAmount() {
+        assertThatThrownBy(() -> orderService.createOrder(
+                new OrderRequest(null, CurrencyCode.KRW, CurrencyCode.USD)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("수량은 필수");
+
+        then(exchangeRateHistoryRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("USD -> USD 같은 통화 주문도 거부된다")
+    void rejectsSameCurrencyForeignOrder() {
+        assertThatThrownBy(() -> orderService.createOrder(
+                new OrderRequest(new BigDecimal("100"), CurrencyCode.USD, CurrencyCode.USD)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("같은 통화");
     }
 
     @Test
