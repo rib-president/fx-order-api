@@ -57,6 +57,8 @@ public class ExchangeRateJobService {
             List<ExchangeRateHistory> histories = new ArrayList<>();
 
             for (CurrencyCode currency : CurrencyCode.values()) {
+                if (currency == CurrencyCode.KRW) continue;
+
                 BigDecimal foreignRate = rates.get(currency.name());
                 if (foreignRate == null) {
                     log.warn("{}에 대한 환율 정보 없음, 건너뜀", currency);
