@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'checkstyle'
     id 'org.springframework.boot' version '3.4.5'
     id 'io.spring.dependency-management' version '1.1.7'
 }
@@ -15,6 +16,11 @@ java {
 
 repositories {
     mavenCentral()
+}
+
+// 린트. 지적은 경고로만 내고(config/checkstyle/checkstyle.xml) CI를 막지 않는다.
+checkstyle {
+    toolVersion = '10.21.4'
 }
 
 dependencies {
