@@ -69,3 +69,6 @@ data/
 *.db
 
 !gradle/wrapper/gradle-wrapper.jar
+
+### Python ###
+__pycache__/
